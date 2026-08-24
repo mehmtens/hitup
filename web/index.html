@@ -68,16 +68,15 @@
         .sidebar-header { padding: 12px 16px; background: var(--bg-header); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
         .sidebar-brand { font-size: 20px; font-weight: 800; color: var(--accent); cursor: pointer; }
         .header-actions { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .icon-btn { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; position: relative; }
         .icon-btn:hover, .icon-btn.active { color: var(--accent); background: rgba(0, 168, 132, 0.1); }
-        .icon-btn.recording { color: #ef4444; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
         /* Stories Bar */
         .stories-bar { display: flex; gap: 12px; padding: 12px 16px; overflow-x: auto; background: var(--bg-sidebar); border-bottom: 1px solid var(--border-color); scrollbar-width: none; }
         .stories-bar::-webkit-scrollbar { display: none; }
         .story-circle-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; flex-shrink: 0; }
-        .story-circle { width: 50px; height: 50px; border-radius: 50%; padding: 2px; border: 2px dashed var(--accent); display: flex; align-items: center; justify-content: center; }
+        .story-circle { width: 52px; height: 52px; border-radius: 50%; padding: 2px; border: 2.5px dashed var(--accent); display: flex; align-items: center; justify-content: center; }
+        .story-circle.viewed { border-color: var(--text-secondary); border-style: solid; }
         .story-avatar { width: 100%; height: 100%; border-radius: 50%; background: var(--bg-header); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; overflow: hidden; }
         .story-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .story-username { font-size: 11px; color: var(--text-secondary); max-width: 54px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
@@ -135,16 +134,18 @@
         .message-author { font-size: 11px; font-weight: bold; color: #53bdeb; margin-bottom: 2px; }
         .message-media-img { max-width: 280px; max-height: 240px; border-radius: 8px; margin-top: 4px; display: block; cursor: pointer; }
         .message-video { max-width: 320px; border-radius: 8px; margin-top: 4px; }
-        .message-audio { margin-top: 6px; max-width: 240px; height: 36px; }
+        .message-audio { margin-top: 6px; max-width: 260px; height: 38px; }
         .message-time { font-size: 11px; color: var(--text-secondary); float: right; margin-left: 14px; margin-top: 4px; display: flex; align-items: center; gap: 2px; }
         .star-icon { font-size: 11px; color: #f59e0b; margin-left: 2px; }
 
+        /* Link Preview Card */
         .link-preview-card { background: rgba(0,0,0,0.2); border-radius: 6px; overflow: hidden; margin-top: 6px; border: 1px solid var(--border-color); text-decoration: none; display: block; }
         .link-preview-img { width: 100%; max-height: 140px; object-fit: cover; }
         .link-preview-info { padding: 6px 10px; }
         .link-preview-title { font-weight: bold; font-size: 13px; color: var(--accent); margin-bottom: 2px; }
         .link-preview-desc { font-size: 11px; color: var(--text-secondary); }
 
+        /* Poll UI */
         .poll-card { padding: 4px 0; min-width: 240px; }
         .poll-question { font-weight: bold; font-size: 15px; margin-bottom: 8px; color: var(--text-primary); }
         .poll-opt { margin-bottom: 6px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 10px; cursor: pointer; position: relative; overflow: hidden; }
@@ -163,24 +164,60 @@
         .ticks { font-size: 12px; margin-left: 4px; color: var(--text-secondary); }
         .ticks.read { color: #53bdeb; }
 
-        .chat-input-area { padding: 10px 16px; background: var(--bg-header); display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--border-color); }
+        /* Input Area & Audio Recording Bar */
+        .chat-input-area { padding: 10px 16px; background: var(--bg-header); display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--border-color); position: relative; }
         .chat-input { flex-grow: 1; padding: 12px 16px; border-radius: 8px; border: none; background: var(--bg-input); color: var(--text-primary); font-size: 15px; outline: none; }
         .send-btn { background: var(--accent); border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #111b21; flex-shrink: 0; }
+
+        /* WhatsApp-Style Voice Recording Bar */
+        #recordingBar { display: none; flex-grow: 1; align-items: center; gap: 14px; background: var(--bg-header); padding: 4px 10px; border-radius: 8px; }
+        .rec-dot { width: 12px; height: 12px; background: #ef4444; border-radius: 50%; animation: recBlink 1s infinite; }
+        @keyframes recBlink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .rec-timer { font-size: 15px; font-weight: bold; color: #ef4444; font-family: monospace; min-width: 50px; }
+        .rec-waveform-canvas { flex-grow: 1; height: 32px; background: transparent; }
+        .rec-cancel-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 20px; padding: 4px 8px; }
+        .rec-cancel-btn:hover { color: #ef4444; }
 
         #emojiPicker { display: none; position: absolute; bottom: 65px; left: 16px; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; width: 300px; max-height: 220px; overflow-y: auto; z-index: 50; grid-template-columns: repeat(6, 1fr); gap: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
         .emoji-item { font-size: 22px; text-align: center; cursor: pointer; padding: 4px; border-radius: 4px; }
         .emoji-item:hover { background: var(--bg-header); }
 
+        /* WebRTC Video Call Overlay with Discord/WhatsApp Style Disabled State */
         #callOverlay { display: none; position: fixed; inset: 0; background: rgba(11, 20, 26, 0.96); z-index: 200; flex-direction: column; align-items: center; justify-content: center; }
         .video-grid { position: relative; width: 90vw; max-width: 900px; height: 60vh; background: #000; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         #remoteVideo { width: 100%; height: 100%; object-fit: cover; }
         #localVideo { position: absolute; bottom: 20px; right: 20px; width: 180px; height: 120px; background: #222; border-radius: 8px; border: 2px solid var(--accent); object-fit: cover; }
+        
+        .cam-off-placeholder { display: none; position: absolute; inset: 0; background: #182229; align-items: center; justify-content: center; flex-direction: column; color: var(--text-secondary); font-size: 14px; gap: 8px; z-index: 2; }
+        .cam-off-placeholder.active { display: flex; }
+
         .call-controls { margin-top: 24px; display: flex; gap: 16px; align-items: center; }
-        .call-btn { width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .call-btn { width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; color: #fff; transition: 0.2s; position: relative; }
         .call-btn.end { background: #ef4444; }
         .call-btn.accept { background: #10b981; }
         .call-btn.toggle { background: #374151; }
+        .call-btn.muted, .call-btn.disabled { background: #ef4444 !important; color: #fff; }
+        .call-btn.muted::after, .call-btn.disabled::after {
+            content: '';
+            position: absolute;
+            width: 70%;
+            height: 3px;
+            background: #fff;
+            transform: rotate(45deg);
+            border-radius: 2px;
+        }
 
+        /* Full Screen Story Viewer Overlay */
+        #storyViewerOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 250; flex-direction: column; align-items: center; justify-content: center; }
+        .story-progress-bar { position: absolute; top: 16px; left: 20px; right: 20px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
+        .story-progress-fill { height: 100%; background: #fff; width: 0%; transition: width 0.1s linear; }
+        .story-view-header { position: absolute; top: 30px; left: 20px; display: flex; align-items: center; gap: 12px; color: #fff; }
+        .story-view-content { max-width: 85vw; max-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .story-view-img { max-width: 100%; max-height: 60vh; border-radius: 8px; object-fit: contain; margin-bottom: 14px; }
+        .story-view-text { font-size: 22px; color: #fff; font-weight: 600; line-height: 1.4; padding: 0 20px; }
+        .story-viewers-footer { position: absolute; bottom: 20px; color: var(--text-secondary); font-size: 13px; cursor: pointer; }
+
+        /* Modals */
         .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 100; }
         .modal-box { background: var(--bg-sidebar); padding: 24px; border-radius: 12px; width: 440px; border: 1px solid var(--border-color); max-height: 85vh; overflow-y: auto; }
         .modal-title { font-size: 18px; font-weight: bold; color: var(--accent); margin-bottom: 16px; }
@@ -219,7 +256,7 @@
 
             <!-- Google Sign In Button -->
             <div id="g_id_onload"
-                 data-client_id="548414007907-mvp67f0s421okrbqo4a50jkeirgsovcp.apps.googleusercontent.com"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
                  data-context="signin"
                  data-ux_mode="popup"
                  data-callback="handleGoogleCredentialResponse"
@@ -274,6 +311,7 @@
                     </div>
                 </div>
 
+                <!-- Stories Bar -->
                 <div class="stories-bar" id="storiesBar">
                     <div class="story-circle-wrap" onclick="openAddStatusModal()">
                         <div class="story-circle">
@@ -335,36 +373,103 @@
                     <button class="icon-btn" style="font-size:14px;" onclick="cancelReply()">✕</button>
                 </div>
 
+                <!-- Input Area with Dynamic Audio Waveform Recording Bar -->
                 <div class="chat-input-area" id="chatInputArea" style="visibility: hidden;">
                     <div id="emojiPicker"></div>
                     
-                    <button class="icon-btn" onclick="toggleEmojiPicker()" title="Emoji">😀</button>
-                    <input type="file" id="fileInput" style="display: none;" onchange="uploadSelectedFile()">
-                    <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="Fotoğraf/Video/Dosya">📎</button>
-                    <button class="icon-btn" onclick="shareLocation()" title="Konum Paylaş">📍</button>
-                    <button class="icon-btn" onclick="openCreatePollModal()" title="Anket Oluştur">📊</button>
-                    <button class="icon-btn" id="micBtn" onclick="toggleVoiceRecord()" title="Sesli Mesaj">🎤</button>
-                    
-                    <input type="text" class="chat-input" id="msgInput" placeholder="Bir mesaj yazın..." autocomplete="off">
-                    <button class="send-btn" onclick="sendMessage()">➤</button>
+                    <!-- Standard Input Items -->
+                    <div id="standardInputGroup" style="display:flex; flex-grow:1; gap:8px; align-items:center;">
+                        <button class="icon-btn" onclick="toggleEmojiPicker()" title="Emoji">😀</button>
+                        <input type="file" id="fileInput" style="display: none;" onchange="uploadSelectedFile()">
+                        <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="Fotoğraf/Video/Dosya">📎</button>
+                        <button class="icon-btn" onclick="shareLocation()" title="Konum Paylaş">📍</button>
+                        <button class="icon-btn" onclick="openCreatePollModal()" title="Anket Oluştur">📊</button>
+                        
+                        <input type="text" class="chat-input" id="msgInput" placeholder="Bir mesaj yazın..." autocomplete="off">
+                    </div>
+
+                    <!-- WhatsApp-Style Live Audio Waveform Recording Bar -->
+                    <div id="recordingBar">
+                        <div class="rec-dot"></div>
+                        <div class="rec-timer" id="recTimerDisplay">00:00</div>
+                        <canvas class="rec-waveform-canvas" id="waveformCanvas" width="200" height="32"></canvas>
+                        <button class="rec-cancel-btn" onclick="cancelVoiceRecording()" title="Kaydı İptal Et">🗑️</button>
+                    </div>
+
+                    <button class="icon-btn" id="micBtn" onclick="toggleVoiceRecord()" title="Sesli Mesaj" style="margin-left:2px;">🎤</button>
+                    <button class="send-btn" id="sendMsgBtn" onclick="sendMessage()">➤</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- WebRTC Video Call Overlay -->
+    <!-- WebRTC Video Call Overlay with Strikethrough Status and Avatar Card -->
     <div id="callOverlay">
         <div id="callStatusText" style="color:var(--accent); font-size:18px; margin-bottom:14px;">Görüşme Başlatılıyor...</div>
         <div class="video-grid">
             <video id="remoteVideo" autoplay playsinline></video>
+            <div class="cam-off-placeholder" id="remoteCamOff">
+                <div class="avatar" style="width:72px; height:72px; font-size:28px;">📷🚫</div>
+                <div id="remoteCamOffText">Kamera Kapalı</div>
+            </div>
+
             <video id="localVideo" autoplay playsinline muted></video>
+            <div class="cam-off-placeholder" id="localCamOff" style="position:absolute; bottom:20px; right:20px; width:180px; height:120px; border-radius:8px; border:2px solid var(--accent);">
+                <div style="font-size:20px;">📷🚫</div>
+                <div style="font-size:11px;">Kameranız Kapalı</div>
+            </div>
         </div>
         <div class="call-controls">
             <button class="call-btn accept" id="acceptCallBtn" onclick="answerCall()" style="display:none;" title="Kabul Et">📞</button>
-            <button class="call-btn toggle" onclick="toggleAudioTrack()" title="Mikrofon">🎤</button>
-            <button class="call-btn toggle" onclick="toggleVideoTrack()" title="Kamera">📷</button>
-            <button class="call-btn toggle" onclick="toggleScreenShare()" title="Ekran Paylaş">🖥️</button>
+            <button class="call-btn toggle" id="micToggleBtn" onclick="toggleAudioTrack()" title="Mikrofon Aç/Kapat">🎤</button>
+            <button class="call-btn toggle" id="camToggleBtn" onclick="toggleVideoTrack()" title="Kamera Aç/Kapat">📷</button>
+            <button class="call-btn toggle" id="screenShareBtn" onclick="toggleScreenShare()" title="Ekran Paylaş">🖥️</button>
             <button class="call-btn end" onclick="endCall(true)" title="Sonlandır">☎</button>
+        </div>
+    </div>
+
+    <!-- Full Screen WhatsApp Status / Story Viewer Overlay -->
+    <div id="storyViewerOverlay" onclick="closeStoryViewer()">
+        <div class="story-progress-bar">
+            <div class="story-progress-fill" id="storyProgressFill"></div>
+        </div>
+        <div class="story-view-header">
+            <div class="avatar" id="storyViewAvatar" style="width:40px; height:40px;">?</div>
+            <div>
+                <div style="font-weight:bold; font-size:15px;" id="storyViewUsername">Kullanıcı</div>
+                <div style="font-size:11px; color:#aebac1;" id="storyViewTime">Şimdi</div>
+            </div>
+        </div>
+        <div class="story-view-content" onclick="event.stopPropagation()">
+            <img id="storyViewImage" class="story-view-img" style="display:none;">
+            <div class="story-view-text" id="storyViewText"></div>
+        </div>
+        <div class="story-viewers-footer" id="storyViewersFooter"></div>
+    </div>
+
+    <!-- WhatsApp-Style Status / Story Creator Modal -->
+    <div class="modal-mask" id="statusModal">
+        <div class="modal-box" style="width: 480px; text-align:center;">
+            <div class="modal-title">✨ Yeni Durum Paylaş</div>
+            
+            <div id="statusPreviewContainer" style="width:100%; height:220px; background:#182229; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; overflow:hidden; border:1px dashed var(--border-color); position:relative;">
+                <img id="statusImgPreview" style="display:none; width:100%; height:100%; object-fit:contain;">
+                <div id="statusTextPreview" style="font-size:20px; font-weight:600; color:#fff; padding:16px;"></div>
+            </div>
+
+            <input type="file" id="statusFileInput" accept="image/*,video/*" style="display:none;" onchange="handleStatusFileSelect()">
+            <div style="display:flex; gap:10px; margin-bottom:14px;">
+                <button class="btn btn-secondary" onclick="document.getElementById('statusFileInput').click()">📷 Fotoğraf / Video Seç</button>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="statusTextInput" placeholder="Bir başlık veya durum yazın..." oninput="updateStatusTextPreview()">
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-primary" onclick="submitStatus()">➤ Durumu Paylaş (24 Saat)</button>
+                <button class="btn btn-secondary" onclick="closeModal('statusModal')">İptal</button>
+            </div>
         </div>
     </div>
 
@@ -499,23 +604,6 @@
         </div>
     </div>
 
-    <!-- Status / Story Add Modal -->
-    <div class="modal-mask" id="statusModal">
-        <div class="modal-box">
-            <div class="modal-title">✨ Yeni Durum Paylaş</div>
-            <div class="input-group">
-                <input type="text" id="statusTextInput" placeholder="Bugün neler oluyor?">
-            </div>
-            <div class="input-group">
-                <input type="text" id="statusMediaInput" placeholder="Fotoğraf/Görsel URL (İsteğe bağlı)">
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-primary" onclick="submitStatus()">Paylaş (24 Saat)</button>
-                <button class="btn btn-secondary" onclick="closeModal('statusModal')">İptal</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Media Gallery Modal -->
     <div class="modal-mask" id="galleryModal">
         <div class="modal-box" style="width: 600px;">
@@ -540,14 +628,26 @@
         let isTyping = false;
         let typingTimeout = null;
         let remoteTypingTimeout = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let isRecording = false;
         let currentMessageDuration = 0;
         let oldestMessageID = 0;
         let rawSidebarList = [];
-
         let replyingTo = null;
+
+        // Web Audio & Recording
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordInterval = null;
+        let recordSeconds = 0;
+        let audioCtx = null;
+        let analyser = null;
+        let animFrameId = null;
+        let isAudioMuted = false;
+        let isVideoMuted = false;
+
+        // Status File
+        let selectedStatusFile = null;
+        let storyTimer = null;
 
         // WebRTC
         let peerConnection = null;
@@ -666,7 +766,6 @@
             alert("Yeni doğrulama kodu e-postanıza gönderildi.");
         }
 
-        // Google Sign-In Callback
         async function handleGoogleCredentialResponse(response) {
             const res = await fetch("/api/auth/google", {
                 method: "POST",
@@ -796,6 +895,9 @@
                 } else if (msg.type === "ice_candidate" && peerConnection) {
                     if (msg.candidate) await peerConnection.addIceCandidate(new RTCIceCandidate(msg.candidate));
                     return;
+                } else if (msg.type === "call_media_state") {
+                    handleRemoteMediaState(msg);
+                    return;
                 } else if (msg.type === "call_reject" || msg.type === "call_end") {
                     endCall(false);
                     return;
@@ -830,6 +932,9 @@
                         }
                     } else if (msg.type === "reaction") {
                         updateMessageReactions(msg.id, msg.reactions);
+                    } else if (msg.type === "poll_vote" && msg.poll) {
+                        const pollEl = document.getElementById("poll_" + msg.poll.id);
+                        if (pollEl) pollEl.outerHTML = renderPollHTML(msg.poll);
                     } else if (msg.type === "typing" && msg.sender_id !== currentUserID) {
                         showTyping(msg.sender_username);
                     } else if (msg.type === "stop_typing" && msg.sender_id !== currentUserID) {
@@ -867,17 +972,123 @@
                         </div>
                         <div class="story-username">${escapeHtml(s.username)}</div>
                     `;
-                    div.onclick = () => {
-                        let viewerText = (s.views && s.views.length > 0) ? `\n\n👀 Görenler: ${s.views.join(', ')}` : "";
-                        alert(`✨ ${s.username} Durumu:\n"${s.content}"${viewerText}`);
-                        fetch("/api/status/view", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-                            body: JSON.stringify({ status_id: s.id })
-                        });
-                    };
+                    div.onclick = () => openStoryViewer(s);
                     feed.appendChild(div);
                 });
+            }
+        }
+
+        function openStoryViewer(story) {
+            const overlay = document.getElementById("storyViewerOverlay");
+            overlay.style.display = "flex";
+
+            document.getElementById("storyViewAvatar").innerHTML = story.avatar_url ? `<img src="${story.avatar_url}" style="width:100%; height:100%; border-radius:50%;">` : story.username.charAt(0).toUpperCase();
+            document.getElementById("storyViewUsername").textContent = story.username;
+            document.getElementById("storyViewTime").textContent = new Date(story.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+            const imgEl = document.getElementById("storyViewImage");
+            if (story.media_url) {
+                imgEl.src = story.media_url;
+                imgEl.style.display = "block";
+            } else {
+                imgEl.style.display = "none";
+            }
+
+            document.getElementById("storyViewText").textContent = story.content || "";
+
+            const footer = document.getElementById("storyViewersFooter");
+            if (story.user_id === currentUserID && story.views && story.views.length > 0) {
+                footer.textContent = `👀 Görenler (${story.views.length}): ${story.views.join(', ')}`;
+            } else {
+                footer.textContent = "";
+            }
+
+            // Progress bar animation
+            const progress = document.getElementById("storyProgressFill");
+            progress.style.width = "0%";
+            let start = Date.now();
+            clearInterval(storyTimer);
+            storyTimer = setInterval(() => {
+                let diff = Date.now() - start;
+                let pct = (diff / 5000) * 100;
+                progress.style.width = pct + "%";
+                if (pct >= 100) {
+                    clearInterval(storyTimer);
+                    closeStoryViewer();
+                }
+            }, 50);
+
+            fetch("/api/status/view", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+                body: JSON.stringify({ status_id: story.id })
+            });
+        }
+
+        function closeStoryViewer() {
+            clearInterval(storyTimer);
+            document.getElementById("storyViewerOverlay").style.display = "none";
+        }
+
+        function openAddStatusModal() {
+            selectedStatusFile = null;
+            document.getElementById("statusImgPreview").style.display = "none";
+            document.getElementById("statusTextPreview").textContent = "";
+            document.getElementById("statusTextInput").value = "";
+            document.getElementById("statusModal").style.display = "flex";
+        }
+
+        function handleStatusFileSelect() {
+            const input = document.getElementById("statusFileInput");
+            if (input.files && input.files[0]) {
+                selectedStatusFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.getElementById("statusImgPreview");
+                    img.src = e.target.result;
+                    img.style.display = "block";
+                };
+                reader.readAsDataURL(selectedStatusFile);
+            }
+        }
+
+        function updateStatusTextPreview() {
+            const text = document.getElementById("statusTextInput").value;
+            document.getElementById("statusTextPreview").textContent = text;
+        }
+
+        async function submitStatus() {
+            const text = document.getElementById("statusTextInput").value.trim();
+            let mediaUrl = "";
+
+            if (selectedStatusFile) {
+                const formData = new FormData();
+                formData.append("file", selectedStatusFile);
+                const upRes = await fetch("/api/upload", {
+                    method: "POST",
+                    headers: { "Authorization": "Bearer " + token },
+                    body: formData
+                });
+                if (upRes.ok) {
+                    const upData = await upRes.json();
+                    mediaUrl = upData.url;
+                }
+            }
+
+            if (!text && !mediaUrl) {
+                alert("Lütfen bir metin yazın veya fotoğraf seçin.");
+                return;
+            }
+
+            const res = await fetch("/api/status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+                body: JSON.stringify({ content: text, media_url: mediaUrl })
+            });
+
+            if (res.ok) {
+                closeModal('statusModal');
+                loadStories();
             }
         }
 
@@ -1101,24 +1312,6 @@
             document.getElementById("timerBtn").className = "icon-btn " + (currentMessageDuration > 0 ? "active" : "");
         }
 
-        function openAddStatusModal() { document.getElementById("statusModal").style.display = "flex"; }
-
-        async function submitStatus() {
-            const text = document.getElementById("statusTextInput").value.trim();
-            const media = document.getElementById("statusMediaInput").value.trim();
-            if (!text) return;
-            const res = await fetch("/api/status", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-                body: JSON.stringify({ content: text, media_url: media })
-            });
-            if (res.ok) {
-                closeModal('statusModal');
-                document.getElementById("statusTextInput").value = "";
-                loadStories();
-            }
-        }
-
         function updateHeaderStatus() {
             const statusEl = document.getElementById("activeContactStatus");
             if (activeConvType === "group") {
@@ -1281,15 +1474,13 @@
         }
 
         async function votePoll(pollID, optionID) {
-            const res = await fetch("/api/messages/poll-vote", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-                body: JSON.stringify({ poll_id: pollID, option_id: optionID })
-            });
-            if (res.ok) {
-                const updatedPoll = await res.json();
-                const pollEl = document.getElementById("poll_" + pollID);
-                if (pollEl) pollEl.outerHTML = renderPollHTML(updatedPoll);
+            if (ws && ws.readyState === WebSocket.OPEN && activeConvID) {
+                ws.send(JSON.stringify({
+                    type: "poll_vote",
+                    conversation_id: activeConvID,
+                    poll_id: pollID,
+                    option_id: optionID
+                }));
             }
         }
 
@@ -1339,7 +1530,11 @@
         async function sendMessage() {
             const input = document.getElementById("msgInput");
             const text = input.value.trim();
-            if (text && ws && ws.readyState === WebSocket.OPEN && activeConvID) {
+            if (!activeConvID) {
+                alert("Lütfen önce sol taraftan bir kişi veya sohbet seçin.");
+                return;
+            }
+            if (text && ws && ws.readyState === WebSocket.OPEN) {
                 let linkPreview = null;
                 const urlMatch = text.match(/(https?:\/\/[^\s]+)/g);
                 if (urlMatch && urlMatch.length > 0) {
@@ -1365,12 +1560,18 @@
                 input.value = "";
                 cancelReply();
                 sendTypingEvent(false);
+            } else if (!ws || ws.readyState !== WebSocket.OPEN) {
+                connectWebSocket();
             }
         }
 
         async function uploadSelectedFile() {
             const fileInput = document.getElementById("fileInput");
             if (!fileInput.files || fileInput.files.length === 0) return;
+            if (!activeConvID) {
+                alert("Lütfen önce sol taraftan bir kişi veya sohbet seçin.");
+                return;
+            }
             const file = fileInput.files[0];
             const formData = new FormData();
             formData.append("file", file);
@@ -1399,6 +1600,8 @@
                 }
                 ws.send(JSON.stringify(payload));
                 cancelReply();
+            } else {
+                alert("Dosya yüklenemedi: " + (await res.text()));
             }
             fileInput.value = "";
         }
@@ -1443,46 +1646,133 @@
             document.getElementById("pollQuestionInput").value = "";
         }
 
+        /* WhatsApp-Style Live Audio Recording with Waveform */
         async function toggleVoiceRecord() {
-            const micBtn = document.getElementById("micBtn");
+            if (!activeConvID) {
+                alert("Lütfen önce sol taraftan bir kişi veya sohbet seçin.");
+                return;
+            }
+
             if (!isRecording) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
+
+                    // Web Audio Analyser for live waveform
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 64;
+                    const source = audioCtx.createMediaStreamSource(stream);
+                    source.connect(analyser);
+
                     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                     mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const formData = new FormData();
-                        formData.append("file", audioBlob, "voice_" + Date.now() + ".webm");
+                        stopWaveformAnimation();
+                        if (audioChunks.length > 0) {
+                            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                            const formData = new FormData();
+                            formData.append("file", audioBlob, "voice_" + Date.now() + ".webm");
 
-                        const res = await fetch("/api/upload", {
-                            method: "POST",
-                            headers: { "Authorization": "Bearer " + token },
-                            body: formData
-                        });
-                        if (res.ok) {
-                            const data = await res.json();
-                            ws.send(JSON.stringify({
-                                type: "audio",
-                                conversation_id: activeConvID,
-                                content: "Sesli Mesaj",
-                                media_url: data.url,
-                                duration_sec: currentMessageDuration
-                            }));
+                            const res = await fetch("/api/upload", {
+                                method: "POST",
+                                headers: { "Authorization": "Bearer " + token },
+                                body: formData
+                            });
+                            if (res.ok) {
+                                const data = await res.json();
+                                ws.send(JSON.stringify({
+                                    type: "audio",
+                                    conversation_id: activeConvID,
+                                    content: "Sesli Mesaj",
+                                    media_url: data.url,
+                                    duration_sec: currentMessageDuration
+                                }));
+                            }
                         }
                     };
+
                     mediaRecorder.start();
                     isRecording = true;
-                    micBtn.classList.add("recording");
+
+                    // UI Switch to Recording Bar
+                    document.getElementById("standardInputGroup").style.display = "none";
+                    document.getElementById("recordingBar").style.display = "flex";
+                    document.getElementById("micBtn").style.display = "none";
+                    document.getElementById("sendMsgBtn").onclick = stopAndSendVoiceRecording;
+
+                    recordSeconds = 0;
+                    document.getElementById("recTimerDisplay").textContent = "00:00";
+                    clearInterval(recordInterval);
+                    recordInterval = setInterval(() => {
+                        recordSeconds++;
+                        const m = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+                        const s = String(recordSeconds % 60).padStart(2, '0');
+                        document.getElementById("recTimerDisplay").textContent = `${m}:${s}`;
+                    }, 1000);
+
+                    startWaveformAnimation();
                 } catch(e) {
-                    alert("Mikrofon erişim izni verilmedi.");
+                    alert("Mikrofon erişim izni verilmedi: " + e.message);
                 }
             } else {
+                stopAndSendVoiceRecording();
+            }
+        }
+
+        function startWaveformAnimation() {
+            const canvas = document.getElementById("waveformCanvas");
+            const ctx = canvas.getContext("2d");
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function draw() {
+                animFrameId = requestAnimationFrame(draw);
+                analyser.getByteFrequencyData(dataArray);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const barWidth = (canvas.width / bufferLength) * 2;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    const barHeight = (dataArray[i] / 255) * canvas.height;
+                    ctx.fillStyle = "#00a884";
+                    ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
+                    x += barWidth;
+                }
+            }
+            draw();
+        }
+
+        function stopWaveformAnimation() {
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            if (audioCtx) { audioCtx.close(); audioCtx = null; }
+        }
+
+        function stopAndSendVoiceRecording() {
+            if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
                 isRecording = false;
-                micBtn.classList.remove("recording");
+                clearInterval(recordInterval);
+                resetRecordingUI();
             }
+        }
+
+        function cancelVoiceRecording() {
+            if (mediaRecorder && isRecording) {
+                audioChunks = [];
+                mediaRecorder.stop();
+                isRecording = false;
+                clearInterval(recordInterval);
+                resetRecordingUI();
+            }
+        }
+
+        function resetRecordingUI() {
+            document.getElementById("recordingBar").style.display = "none";
+            document.getElementById("standardInputGroup").style.display = "flex";
+            document.getElementById("micBtn").style.display = "flex";
+            document.getElementById("sendMsgBtn").onclick = sendMessage;
         }
 
         function deleteMessage(msgID, forEveryone) {
@@ -1610,7 +1900,7 @@
             }
         }
 
-        /* WebRTC */
+        /* WebRTC & Media State Controls */
         async function startCall(isVideo) {
             if (!activeTargetUser || activeConvType !== "direct") {
                 alert("Yalnızca 1:1 sohbetlerde arama yapabilirsiniz.");
@@ -1619,6 +1909,9 @@
             document.getElementById("callOverlay").style.display = "flex";
             document.getElementById("callStatusText").textContent = activeTargetUser.username + " Aranıyor...";
             document.getElementById("acceptCallBtn").style.display = "none";
+            isAudioMuted = false;
+            isVideoMuted = !isVideo;
+            updateMediaButtonsUI();
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
@@ -1645,7 +1938,7 @@
         function handleIncomingCall(msg) {
             incomingOffer = msg;
             document.getElementById("callOverlay").style.display = "flex";
-            document.getElementById("callStatusText").textContent = msg.sender_username + " sizi görüntülü/sesli arıyor...";
+            document.getElementById("callStatusText").textContent = msg.sender_username + " sizi arıyor...";
             document.getElementById("acceptCallBtn").style.display = "flex";
         }
 
@@ -1653,6 +1946,9 @@
             if (!incomingOffer) return;
             document.getElementById("acceptCallBtn").style.display = "none";
             document.getElementById("callStatusText").textContent = "Görüşme Başlatılıyor...";
+            isAudioMuted = false;
+            isVideoMuted = false;
+            updateMediaButtonsUI();
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -1679,13 +1975,76 @@
             }
         }
 
+        function toggleAudioTrack() {
+            if (localStream) {
+                const track = localStream.getAudioTracks()[0];
+                if (track) {
+                    isAudioMuted = !isAudioMuted;
+                    track.enabled = !isAudioMuted;
+                    updateMediaButtonsUI();
+                    broadcastMediaState();
+                }
+            }
+        }
+
+        function toggleVideoTrack() {
+            if (localStream) {
+                const track = localStream.getVideoTracks()[0];
+                if (track) {
+                    isVideoMuted = !isVideoMuted;
+                    track.enabled = !isVideoMuted;
+                    updateMediaButtonsUI();
+                    broadcastMediaState();
+                }
+            }
+        }
+
+        function updateMediaButtonsUI() {
+            const micBtn = document.getElementById("micToggleBtn");
+            const camBtn = document.getElementById("camToggleBtn");
+            const localCamOff = document.getElementById("localCamOff");
+
+            if (isAudioMuted) micBtn.className = "call-btn toggle muted";
+            else micBtn.className = "call-btn toggle";
+
+            if (isVideoMuted) {
+                camBtn.className = "call-btn toggle disabled";
+                localCamOff.classList.add("active");
+            } else {
+                camBtn.className = "call-btn toggle";
+                localCamOff.classList.remove("active");
+            }
+        }
+
+        function broadcastMediaState() {
+            if (ws && (activeTargetUser || incomingOffer)) {
+                const targetID = activeTargetUser ? activeTargetUser.id : incomingOffer.sender_id;
+                ws.send(JSON.stringify({
+                    type: "call_media_state",
+                    target_user_id: targetID,
+                    is_audio_muted: isAudioMuted,
+                    is_video_muted: isVideoMuted
+                }));
+            }
+        }
+
+        function handleRemoteMediaState(msg) {
+            const remoteCamOff = document.getElementById("remoteCamOff");
+            if (msg.is_video_muted) {
+                remoteCamOff.classList.add("active");
+                document.getElementById("remoteCamOffText").textContent = (activeTargetUser ? activeTargetUser.username : "Karşı taraf") + " kamerasını kapattı";
+            } else {
+                remoteCamOff.classList.remove("active");
+            }
+        }
+
         async function toggleScreenShare() {
             if (!peerConnection) return;
             try {
                 screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
                 const screenTrack = screenStream.getVideoTracks()[0];
                 const senders = peerConnection.getSenders();
-                const sender = senders.find(s => s.track.kind === 'video');
+                const sender = senders.find(s => s.track && s.track.kind === 'video');
                 if (sender) sender.replaceTrack(screenTrack);
                 document.getElementById("localVideo").srcObject = screenStream;
                 screenTrack.onended = () => {
@@ -1710,20 +2069,8 @@
             document.getElementById("callOverlay").style.display = "none";
             document.getElementById("localVideo").srcObject = null;
             document.getElementById("remoteVideo").srcObject = null;
-        }
-
-        function toggleAudioTrack() {
-            if (localStream) {
-                const track = localStream.getAudioTracks()[0];
-                if (track) track.enabled = !track.enabled;
-            }
-        }
-
-        function toggleVideoTrack() {
-            if (localStream) {
-                const track = localStream.getVideoTracks()[0];
-                if (track) track.enabled = !track.enabled;
-            }
+            document.getElementById("localCamOff").classList.remove("active");
+            document.getElementById("remoteCamOff").classList.remove("active");
         }
 
         function sendReadReceipt(convID) {
@@ -1759,7 +2106,6 @@
             clearTimeout(typingTimeout);
             typingTimeout = setTimeout(() => sendTypingEvent(false), 1800);
         });
-
         msgInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 
         async function openGroupModal() {

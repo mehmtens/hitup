@@ -14,7 +14,7 @@ import (
 
 type Message struct {
 	ID              int                      `json:"id,omitempty"`
-	Type            string                   `json:"type"` 
+	Type            string                   `json:"type"` // chat, image, video, audio, file, location, poll, poll_create, poll_vote, typing, stop_typing, read, presence, delete_message_for_everyone, delete_message_for_me, edit_message, reaction, call_offer, call_answer, ice_candidate, call_reject, call_end, call_media_state, screen_share_offer, screen_share_answer
 	ConversationID  int                      `json:"conversation_id,omitempty"`
 	SenderID        int                      `json:"sender_id"`
 	SenderUsername  string                   `json:"sender_username,omitempty"`
@@ -43,6 +43,8 @@ type Message struct {
 	IsDeleted       bool                     `json:"is_deleted,omitempty"`
 	IsEdited        bool                     `json:"is_edited,omitempty"`
 	DurationSec     int                      `json:"duration_sec,omitempty"`
+	IsAudioMuted    bool                     `json:"is_audio_muted,omitempty"`
+	IsVideoMuted    bool                     `json:"is_video_muted,omitempty"`
 	SDP             string                   `json:"sdp,omitempty"`
 	Candidate       json.RawMessage          `json:"candidate,omitempty"`
 	CreatedAt       time.Time                `json:"created_at"`
@@ -147,7 +149,7 @@ func (h *Hub) Run(ctx context.Context) {
 			h.mu.Unlock()
 
 		case msg := <-h.broadcast:
-			// WebRTC Çağrı & Ekran Paylaşımı Sinyalleşmesi
+			// WebRTC Çağrı & Ekran Paylaşımı & Medya Durum Sinyalleri
 			if isCallSignal(msg.Type) {
 				if h.redis != nil {
 					h.redis.Publish(ctx, fmt.Sprintf("chat:call_%d", msg.TargetUserID), msg)
@@ -176,13 +178,12 @@ func (h *Hub) Run(ctx context.Context) {
 					DurationSec:     msg.DurationSec,
 				})
 				if err != nil {
-					log.Printf("Mesaj kaydedilemedi: %v", err)
+					log.Printf("❌ Mesaj kaydedilemedi: %v", err)
 					continue
 				}
 				msg.ID = savedRecord.ID
 				msg.CreatedAt = savedRecord.CreatedAt
 			} else if msg.Type == "poll_create" && h.db != nil {
-				// Anketli mesaj oluştur
 				savedRecord, err := h.db.SaveMessage(database.SaveMessageParams{
 					ConversationID: msg.ConversationID,
 					SenderID:       msg.SenderID,
@@ -215,7 +216,6 @@ func (h *Hub) Run(ctx context.Context) {
 				}
 			} else if msg.Type == "delete_message_for_me" && h.db != nil {
 				h.db.DeleteMessageForMe(msg.ID, msg.SenderID)
-				// Yalnızca kullanıcıya silindiği bildirilir
 				data, _ := json.Marshal(msg)
 				h.sendToUser(msg.SenderID, data)
 				continue
@@ -244,7 +244,7 @@ func (h *Hub) Run(ctx context.Context) {
 }
 
 func isCallSignal(t string) bool {
-	return t == "call_offer" || t == "call_answer" || t == "ice_candidate" || t == "call_reject" || t == "call_end" || t == "screen_share_offer" || t == "screen_share_answer"
+	return t == "call_offer" || t == "call_answer" || t == "ice_candidate" || t == "call_reject" || t == "call_end" || t == "call_media_state" || t == "screen_share_offer" || t == "screen_share_answer"
 }
 
 func (h *Hub) sendToUser(userID int, data []byte) {

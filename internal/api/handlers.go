@@ -64,13 +64,13 @@ func (a *API) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := a.db.CreateUser(req.Username, req.Email, hash)
+	// Onaylanmamışsa güncelle, onaylıysa çakışma hatası dön
+	user, err := a.db.CreateOrUpdateUnverifiedUser(req.Username, req.Email, hash)
 	if err != nil {
-		http.Error(w, "Bu kullanıcı adı veya e-posta zaten kullanılıyor", http.StatusConflict)
+		http.Error(w, err.Error(), http.StatusConflict)
 		return
 	}
 
-	// 6 Haneli OTP Kodunu oluştur ve e-posta gönder
 	code := email.GenerateOTP()
 	if err := a.db.CreateVerificationCode(user.Email, code, "register", 15); err != nil {
 		log.Printf("Doğrulama kodu kaydedilemedi: %v", err)
@@ -199,7 +199,6 @@ func (a *API) Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(AuthResponse{Token: token, User: user})
 }
 
-// GoogleAuth: POST /api/auth/google
 func (a *API) GoogleAuth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Yalnızca POST desteklenir", http.StatusMethodNotAllowed)
@@ -251,15 +250,19 @@ func (a *API) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := a.db.GetUserByUsernameOrEmail(req.Email)
-	if err == nil {
-		code := email.GenerateOTP()
-		a.db.CreateVerificationCode(user.Email, code, "reset_password", 15)
-		go a.mailer.SendPasswordResetEmail(user.Email, code)
+	if err != nil {
+		http.Error(w, "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.", http.StatusNotFound)
+		return
 	}
+
+	code := email.GenerateOTP()
+	a.db.CreateVerificationCode(user.Email, code, "reset_password", 15)
+	go a.mailer.SendPasswordResetEmail(user.Email, code)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Eğer bu e-posta adresi kayıtlıysa, şifre sıfırlama kodu gönderildi.",
+		"message": "Şifre sıfırlama kodu gönderildi.",
+		"email":   user.Email,
 	})
 }
 

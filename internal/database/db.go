@@ -244,7 +244,7 @@ func (d *DB) initSchema() error {
 		file_size INT DEFAULT 0,
 		location_lat FLOAT DEFAULT 0,
 		location_lng FLOAT DEFAULT 0,
-		link_preview JSONB DEFAULT NULL,
+		link_preview TEXT DEFAULT '',
 		reply_to_id INT REFERENCES messages(id) ON DELETE SET NULL,
 		forwarded_from_id INT REFERENCES messages(id) ON DELETE SET NULL,
 		status VARCHAR(20) NOT NULL DEFAULT 'sent',
@@ -259,7 +259,7 @@ func (d *DB) initSchema() error {
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS file_size INT DEFAULT 0;
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS location_lat FLOAT DEFAULT 0;
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS location_lng FLOAT DEFAULT 0;
-	ALTER TABLE messages ADD COLUMN IF NOT EXISTS link_preview JSONB DEFAULT NULL;
+	ALTER TABLE messages ADD COLUMN IF NOT EXISTS link_preview TEXT DEFAULT '';
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS reply_to_id INT REFERENCES messages(id) ON DELETE SET NULL;
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS forwarded_from_id INT REFERENCES messages(id) ON DELETE SET NULL;
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE;
@@ -342,17 +342,46 @@ func (d *DB) initSchema() error {
 }
 
 // User operations
-func (d *DB) CreateUser(username, email, passwordHash string) (*User, error) {
+func (d *DB) CreateOrUpdateUnverifiedUser(username, email, passwordHash string) (*User, error) {
 	if email == "" {
 		email = username + "@hitup.local"
 	}
+
+	var existingUser User
+	err := d.conn.QueryRow(`
+		SELECT id, username, email, is_verified 
+		FROM users 
+		WHERE email = $1 OR username = $2
+	`, email, username).Scan(&existingUser.ID, &existingUser.Username, &existingUser.Email, &existingUser.IsVerified)
+
+	if err == nil {
+		if existingUser.IsVerified {
+			if existingUser.Email == email {
+				return nil, fmt.Errorf("bu e-posta adresiyle onaylı bir hesap zaten var. Lütfen giriş yapın.")
+			}
+			return nil, fmt.Errorf("bu kullanıcı adı zaten kullanımda.")
+		}
+
+		updateQuery := `
+			UPDATE users 
+			SET username = $1, email = $2, password_hash = $3, created_at = CURRENT_TIMESTAMP 
+			WHERE id = $4
+			RETURNING id, username, email, is_verified, avatar_url, about, privacy_last_seen, privacy_avatar, privacy_about, created_at, last_seen_at
+		`
+		var u User
+		err = d.conn.QueryRow(updateQuery, username, email, passwordHash, existingUser.ID).Scan(
+			&u.ID, &u.Username, &u.Email, &u.IsVerified, &u.AvatarURL, &u.About, &u.PrivacyLastSeen, &u.PrivacyAvatar, &u.PrivacyAbout, &u.CreatedAt, &u.LastSeenAt,
+		)
+		return &u, err
+	}
+
 	query := `
 		INSERT INTO users (username, email, password_hash, is_verified) 
 		VALUES ($1, $2, $3, FALSE) 
 		RETURNING id, username, email, is_verified, avatar_url, about, privacy_last_seen, privacy_avatar, privacy_about, created_at, last_seen_at
 	`
 	var u User
-	err := d.conn.QueryRow(query, username, email, passwordHash).Scan(
+	err = d.conn.QueryRow(query, username, email, passwordHash).Scan(
 		&u.ID, &u.Username, &u.Email, &u.IsVerified, &u.AvatarURL, &u.About, &u.PrivacyLastSeen, &u.PrivacyAvatar, &u.PrivacyAbout, &u.CreatedAt, &u.LastSeenAt,
 	)
 	return &u, err
@@ -399,7 +428,6 @@ func (d *DB) ResetPasswordByEmail(email, newPasswordHash string) error {
 
 func (d *DB) GetOrCreateGoogleUser(googleID, email, name, avatarURL string) (*User, error) {
 	var u User
-	// Google ID ile ara
 	err := d.conn.QueryRow(`
 		SELECT id, username, email, google_id, is_verified, avatar_url, about, privacy_last_seen, privacy_avatar, privacy_about, created_at, last_seen_at 
 		FROM users WHERE google_id = $1
@@ -410,7 +438,6 @@ func (d *DB) GetOrCreateGoogleUser(googleID, email, name, avatarURL string) (*Us
 		return &u, nil
 	}
 
-	// Email ile ara ve bağla
 	err = d.conn.QueryRow(`
 		SELECT id, username, email, google_id, is_verified, avatar_url, about, privacy_last_seen, privacy_avatar, privacy_about, created_at, last_seen_at 
 		FROM users WHERE email = $1
@@ -426,12 +453,10 @@ func (d *DB) GetOrCreateGoogleUser(googleID, email, name, avatarURL string) (*Us
 		return &u, nil
 	}
 
-	// Sıfırdan oluştur
 	username := name
 	if username == "" {
 		username = email
 	}
-	// Benzersiz username üret
 	var count int
 	d.conn.QueryRow(`SELECT COUNT(*) FROM users WHERE username = $1`, username).Scan(&count)
 	if count > 0 {
@@ -817,9 +842,11 @@ func (d *DB) SaveMessage(p SaveMessageParams) (*MessageRecord, error) {
 		expiresAt = &t
 	}
 
-	var linkPreviewJSON []byte
+	linkPreviewStr := ""
 	if p.LinkPreview != nil {
-		linkPreviewJSON, _ = json.Marshal(p.LinkPreview)
+		if b, err := json.Marshal(p.LinkPreview); err == nil {
+			linkPreviewStr = string(b)
+		}
 	}
 
 	query := `
@@ -829,20 +856,27 @@ func (d *DB) SaveMessage(p SaveMessageParams) (*MessageRecord, error) {
 		) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'sent', $13, CURRENT_TIMESTAMP) 
 		RETURNING id, conversation_id, sender_id, content, type, media_url, file_name, file_size, 
-		          location_lat, location_lng, reply_to_id, forwarded_from_id, status, is_deleted, is_edited, expires_at, created_at
+		          location_lat, location_lng, link_preview, reply_to_id, forwarded_from_id, status, is_deleted, is_edited, expires_at, created_at
 	`
 	var m MessageRecord
+	var scannedLinkPreview sql.NullString
 	err := d.conn.QueryRow(
 		query, p.ConversationID, p.SenderID, p.Content, p.Type, p.MediaURL, p.FileName, p.FileSize,
-		p.LocationLat, p.LocationLng, linkPreviewJSON, p.ReplyToID, p.ForwardedFromID, expiresAt,
+		p.LocationLat, p.LocationLng, linkPreviewStr, p.ReplyToID, p.ForwardedFromID, expiresAt,
 	).Scan(
 		&m.ID, &m.ConversationID, &m.SenderID, &m.Content, &m.Type, &m.MediaURL, &m.FileName, &m.FileSize,
-		&m.LocationLat, &m.LocationLng, &m.ReplyToID, &m.ForwardedFromID, &m.Status, &m.IsDeleted, &m.IsEdited, &m.ExpiresAt, &m.CreatedAt,
+		&m.LocationLat, &m.LocationLng, &scannedLinkPreview, &m.ReplyToID, &m.ForwardedFromID, &m.Status, &m.IsDeleted, &m.IsEdited, &m.ExpiresAt, &m.CreatedAt,
 	)
 	if err != nil {
+		log.Printf("❌ [SaveMessage SQL Hatası] %v", err)
 		return nil, err
 	}
-	m.LinkPreview = p.LinkPreview
+	if scannedLinkPreview.Valid && scannedLinkPreview.String != "" {
+		var lp LinkPreview
+		if json.Unmarshal([]byte(scannedLinkPreview.String), &lp) == nil {
+			m.LinkPreview = &lp
+		}
+	}
 	return &m, nil
 }
 
@@ -1285,20 +1319,21 @@ func (d *DB) GetConversationMessages(conversationID, userID, limit, beforeID int
 	var messages []MessageRecord
 	for rows.Next() {
 		var m MessageRecord
-		var linkPrevBytes []byte
+		var linkPrevStr sql.NullString
 		if err := rows.Scan(
 			&m.ID, &m.ConversationID, &m.SenderID, &m.SenderUsername, &m.SenderAvatar, &m.Content, &m.Type, &m.MediaURL,
-			&m.FileName, &m.FileSize, &m.LocationLat, &m.LocationLng, &linkPrevBytes,
+			&m.FileName, &m.FileSize, &m.LocationLat, &m.LocationLng, &linkPrevStr,
 			&m.ReplyToID, &m.ReplyToContent, &m.ReplyToSender,
 			&m.ForwardedFromID,
 			&m.Status, &m.IsStarred, &m.IsDeleted, &m.IsEdited, &m.CreatedAt,
 		); err != nil {
+			log.Printf("❌ [GetConversationMessages Scan Hatası] %v", err)
 			return nil, err
 		}
 
-		if len(linkPrevBytes) > 0 {
+		if linkPrevStr.Valid && linkPrevStr.String != "" {
 			var lp LinkPreview
-			if json.Unmarshal(linkPrevBytes, &lp) == nil {
+			if json.Unmarshal([]byte(linkPrevStr.String), &lp) == nil {
 				m.LinkPreview = &lp
 			}
 		}
