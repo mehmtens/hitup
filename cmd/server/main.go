@@ -36,7 +36,7 @@ func main() {
 
 	os.MkdirAll("./uploads", os.ModePerm)
 
-	// PostgreSQL Bağlantı Dizesi
+	// PostgreSQL Bağlantı Dizesi (Hem Neon/Bulut URL hem de Local Host destekler)
 	connStr := *dbHost
 	if !strings.HasPrefix(connStr, "postgres://") && !strings.HasPrefix(connStr, "postgresql://") {
 		connStr = fmt.Sprintf("postgres://postgres:postgres@%s/chatdb?sslmode=disable", *dbHost)
@@ -121,7 +121,7 @@ func main() {
 	})
 
 	addr := fmt.Sprintf(":%s", *port)
-	log.Printf("HitUp Sunucusu http://localhost:%s adresinde çalışıyor...", *port)
+	log.Printf("HitUp Production Sunucusu http://localhost:%s adresinde çalışıyor...", *port)
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal("Sunucu hatası: ", err)
 	}
