@@ -1,4 +1,4 @@
 uploads/
 *.exe
-server
+/server
 .env
