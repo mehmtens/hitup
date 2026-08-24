@@ -987,11 +987,12 @@ func (a *API) UploadFile(w http.ResponseWriter, r *http.Request) {
 
 	msgType := "file"
 	lowerExt := strings.ToLower(ext)
-	if lowerExt == ".jpg" || lowerExt == ".jpeg" || lowerExt == ".png" || lowerExt == ".gif" || lowerExt == ".webp" {
+	switch lowerExt {
+	case ".jpg", ".jpeg", ".png", ".gif", ".webp":
 		msgType = "image"
-	} else if lowerExt == ".mp4" || lowerExt == ".mov" || lowerExt == ".webm" || lowerExt == ".mkv" {
+	case ".mp4", ".mov", ".webm", ".mkv":
 		msgType = "video"
-	} else if lowerExt == ".mp3" || lowerExt == ".ogg" || lowerExt == ".wav" || lowerExt == ".m4a" {
+	case ".mp3", ".ogg", ".wav", ".m4a":
 		msgType = "audio"
 	}
 
