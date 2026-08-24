@@ -265,6 +265,8 @@ func (d *DB) initSchema() error {
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE;
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS is_edited BOOLEAN DEFAULT FALSE;
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
+	ALTER TABLE messages ALTER COLUMN link_preview TYPE TEXT USING link_preview::text;
+	ALTER TABLE messages ALTER COLUMN link_preview SET DEFAULT '';
 
 	CREATE TABLE IF NOT EXISTS message_deleted_for_users (
 		message_id INT REFERENCES messages(id) ON DELETE CASCADE,
@@ -842,10 +844,10 @@ func (d *DB) SaveMessage(p SaveMessageParams) (*MessageRecord, error) {
 		expiresAt = &t
 	}
 
-	linkPreviewStr := ""
+	var linkPreviewParam interface{}
 	if p.LinkPreview != nil {
 		if b, err := json.Marshal(p.LinkPreview); err == nil {
-			linkPreviewStr = string(b)
+			linkPreviewParam = string(b)
 		}
 	}
 
@@ -862,7 +864,7 @@ func (d *DB) SaveMessage(p SaveMessageParams) (*MessageRecord, error) {
 	var scannedLinkPreview sql.NullString
 	err := d.conn.QueryRow(
 		query, p.ConversationID, p.SenderID, p.Content, p.Type, p.MediaURL, p.FileName, p.FileSize,
-		p.LocationLat, p.LocationLng, linkPreviewStr, p.ReplyToID, p.ForwardedFromID, expiresAt,
+		p.LocationLat, p.LocationLng, linkPreviewParam, p.ReplyToID, p.ForwardedFromID, expiresAt,
 	).Scan(
 		&m.ID, &m.ConversationID, &m.SenderID, &m.Content, &m.Type, &m.MediaURL, &m.FileName, &m.FileSize,
 		&m.LocationLat, &m.LocationLng, &scannedLinkPreview, &m.ReplyToID, &m.ForwardedFromID, &m.Status, &m.IsDeleted, &m.IsEdited, &m.ExpiresAt, &m.CreatedAt,
@@ -966,6 +968,9 @@ func (d *DB) getPollDetails(pollID, userID int) (*PollDTO, error) {
 			p.Options = append(p.Options, opt)
 			p.TotalVotes += opt.VoteCount
 		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return &p, nil
 }
@@ -1071,7 +1076,7 @@ func (d *DB) getMessageReactions(messageID int) ([]ReactionCount, error) {
 			reactions = append(reactions, rc)
 		}
 	}
-	return reactions, nil
+	return reactions, rows.Err()
 }
 
 func (d *DB) GetConversationMediaGallery(convID int) ([]MessageRecord, error) {
