@@ -14,7 +14,7 @@ import (
 
 type Message struct {
 	ID              int                      `json:"id,omitempty"`
-	Type            string                   `json:"type"` // chat, image, video, audio, file, location, poll, poll_create, poll_vote, typing, stop_typing, read, presence, delete_message_for_everyone, delete_message_for_me, edit_message, reaction, call_offer, call_answer, ice_candidate, call_reject, call_end, call_media_state, screen_share_offer, screen_share_answer
+	Type            string                   `json:"type"`
 	ConversationID  int                      `json:"conversation_id,omitempty"`
 	SenderID        int                      `json:"sender_id"`
 	SenderUsername  string                   `json:"sender_username,omitempty"`
@@ -33,6 +33,7 @@ type Message struct {
 	PollMultiple    bool                     `json:"poll_multiple,omitempty"`
 	PollID          int                      `json:"poll_id,omitempty"`
 	PollOptionID    int                      `json:"poll_option_id,omitempty"`
+	OptionID        int                      `json:"option_id,omitempty"`
 	ReplyToID       *int                     `json:"reply_to_id,omitempty"`
 	ReplyToContent  string                   `json:"reply_to_content,omitempty"`
 	ReplyToSender   string                   `json:"reply_to_sender,omitempty"`
@@ -201,7 +202,11 @@ func (h *Hub) Run(ctx context.Context) {
 					}
 				}
 			} else if msg.Type == "poll_vote" && h.db != nil {
-				pollDTO, err := h.db.VotePoll(msg.PollID, msg.PollOptionID, msg.SenderID)
+				optID := msg.PollOptionID
+				if optID == 0 {
+					optID = msg.OptionID
+				}
+				pollDTO, err := h.db.VotePoll(msg.PollID, optID, msg.SenderID)
 				if err == nil {
 					msg.Poll = pollDTO
 				}

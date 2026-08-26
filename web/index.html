@@ -122,14 +122,16 @@
         .reply-preview-bar { display: none; padding: 8px 16px; background: var(--bg-header); border-top: 1px solid var(--border-color); justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); }
         .reply-preview-text { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .chat-messages { flex-grow: 1; padding: 24px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-image: radial-gradient(var(--text-secondary) 1px, transparent 1px); background-size: 24px 24px; }
+        .chat-messages { flex-grow: 1; padding: 24px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-image: radial-gradient(var(--text-secondary) 1px, transparent 1px); background-size: 24px 24px; }
         .load-more-btn { align-self: center; padding: 6px 14px; border-radius: 16px; background: var(--bg-header); border: 1px solid var(--border-color); color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 8px; }
 
-        .message-bubble { max-width: 65%; padding: 8px 14px; border-radius: 10px; font-size: 14px; line-height: 1.45; word-wrap: break-word; position: relative; margin-bottom: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        /* Message Bubble & Bottom Reactions */
+        .message-bubble { max-width: 65%; padding: 8px 14px; border-radius: 10px; font-size: 14px; line-height: 1.45; word-wrap: break-word; position: relative; margin-bottom: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); transition: margin-bottom 0.15s; }
         .message-bubble.incoming { align-self: flex-start; background: var(--bg-bubble-in); border-top-left-radius: 2px; }
         .message-bubble.outgoing { align-self: flex-end; background: var(--bg-bubble-out); border-top-right-radius: 2px; }
         .message-bubble.deleted { font-style: italic; color: var(--text-secondary) !important; background: rgba(0,0,0,0.15); }
-        
+        .message-bubble.has-reactions { margin-bottom: 18px; }
+
         .message-quote { background: rgba(0,0,0,0.15); border-left: 3px solid var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 6px; color: var(--text-secondary); cursor: pointer; }
         .message-author { font-size: 11px; font-weight: bold; color: #53bdeb; margin-bottom: 2px; }
         .message-media-img { max-width: 280px; max-height: 240px; border-radius: 8px; margin-top: 4px; display: block; cursor: pointer; }
@@ -137,6 +139,68 @@
         .message-audio { margin-top: 6px; max-width: 260px; height: 38px; }
         .message-time { font-size: 11px; color: var(--text-secondary); float: right; margin-left: 14px; margin-top: 4px; display: flex; align-items: center; gap: 2px; }
         .star-icon { font-size: 11px; color: #f59e0b; margin-left: 2px; }
+
+        /* WhatsApp Style Bottom Floating Reaction Badges */
+        .reactions-bar {
+            display: flex;
+            gap: 4px;
+            position: absolute;
+            bottom: -13px;
+            z-index: 6;
+            flex-wrap: wrap;
+        }
+        .message-bubble.outgoing .reactions-bar { right: 8px; }
+        .message-bubble.incoming .reactions-bar { left: 8px; }
+
+        .reaction-badge {
+            background: var(--bg-header);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 2px 7px;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+            transition: transform 0.15s ease, background 0.15s ease;
+            user-select: none;
+        }
+        .reaction-badge:hover {
+            transform: scale(1.15);
+            background: var(--bg-sidebar);
+            border-color: var(--accent);
+        }
+
+        /* Hover Action Menu (Top Floating Pill) */
+        .bubble-actions {
+            display: none;
+            position: absolute;
+            top: -16px;
+            right: 6px;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 3px 8px;
+            gap: 6px;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            align-items: center;
+        }
+        .message-bubble:hover .bubble-actions { display: flex; }
+        .act-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px 4px;
+            transition: transform 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .act-btn:hover { transform: scale(1.25); color: var(--text-primary); }
 
         /* Link Preview Card */
         .link-preview-card { background: rgba(0,0,0,0.2); border-radius: 6px; overflow: hidden; margin-top: 6px; border: 1px solid var(--border-color); text-decoration: none; display: block; }
@@ -148,18 +212,10 @@
         /* Poll UI */
         .poll-card { padding: 4px 0; min-width: 240px; }
         .poll-question { font-weight: bold; font-size: 15px; margin-bottom: 8px; color: var(--text-primary); }
-        .poll-opt { margin-bottom: 6px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 10px; cursor: pointer; position: relative; overflow: hidden; }
+        .poll-opt { margin-bottom: 6px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 10px; cursor: pointer; position: relative; overflow: hidden; transition: border-color 0.2s; }
         .poll-opt.voted { border-color: var(--accent); }
-        .poll-bar { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(0, 168, 132, 0.25); z-index: 1; }
+        .poll-bar { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(0, 168, 132, 0.25); z-index: 1; transition: width 0.3s ease; }
         .poll-opt-content { position: relative; z-index: 2; display: flex; justify-content: space-between; font-size: 13px; }
-
-        .bubble-actions { display: none; position: absolute; top: -14px; right: 4px; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 6px; padding: 2px 4px; gap: 4px; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .message-bubble:hover .bubble-actions { display: flex; }
-        .act-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; padding: 2px 4px; }
-        .act-btn:hover { color: var(--text-primary); }
-
-        .reactions-bar { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
-        .reaction-badge { background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 12px; padding: 2px 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 2px; }
 
         .ticks { font-size: 12px; margin-left: 4px; color: var(--text-secondary); }
         .ticks.read { color: #53bdeb; }
@@ -182,7 +238,7 @@
         .emoji-item { font-size: 22px; text-align: center; cursor: pointer; padding: 4px; border-radius: 4px; }
         .emoji-item:hover { background: var(--bg-header); }
 
-        /* WebRTC Video Call Overlay with Discord/WhatsApp Style Disabled State */
+        /* WebRTC Video Call Overlay with Strikethrough Status and Avatar Card */
         #callOverlay { display: none; position: fixed; inset: 0; background: rgba(11, 20, 26, 0.96); z-index: 200; flex-direction: column; align-items: center; justify-content: center; }
         .video-grid { position: relative; width: 90vw; max-width: 900px; height: 60vh; background: #000; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         #remoteVideo { width: 100%; height: 100%; object-fit: cover; }
@@ -614,52 +670,54 @@
     </div>
 
     <script>
-        let isRegisterMode = false;
-        let pendingVerificationEmail = "";
-        let token = localStorage.getItem("token") || "";
-        let currentUserID = parseInt(localStorage.getItem("user_id")) || 0;
-        let currentUsername = localStorage.getItem("username") || "";
-        let currentUser = null;
-        let activeConvID = null;
-        let activeConvType = "direct";
-        let activeTargetUser = null;
-        let currentTab = "chats";
-        let ws = null;
-        let isTyping = false;
-        let typingTimeout = null;
-        let remoteTypingTimeout = null;
-        let currentMessageDuration = 0;
-        let oldestMessageID = 0;
-        let rawSidebarList = [];
-        let replyingTo = null;
+        var isRegisterMode = false;
+        var pendingVerificationEmail = "";
+        var token = localStorage.getItem("token") || "";
+        var currentUserID = parseInt(localStorage.getItem("user_id")) || 0;
+        var currentUsername = localStorage.getItem("username") || "";
+        var currentUser = null;
+        var activeConvID = null;
+        var activeConvType = "direct";
+        var activeTargetUser = null;
+        var currentTab = "chats";
+        var ws = null;
+        var isTyping = false;
+        var typingTimeout = null;
+        var remoteTypingTimeout = null;
+        var currentMessageDuration = 0;
+        var oldestMessageID = 0;
+        var rawSidebarList = [];
+        var replyingTo = null;
 
         // Web Audio & Recording
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let isRecording = false;
-        let recordInterval = null;
-        let recordSeconds = 0;
-        let audioCtx = null;
-        let analyser = null;
-        let animFrameId = null;
-        let isAudioMuted = false;
-        let isVideoMuted = false;
+        var mediaRecorder = null;
+        var audioChunks = [];
+        var isRecording = false;
+        var recordInterval = null;
+        var recordSeconds = 0;
+        var audioCtx = null;
+        var analyser = null;
+        var animFrameId = null;
+        var isAudioMuted = false;
+        var isVideoMuted = false;
 
         // Status File
-        let selectedStatusFile = null;
-        let storyTimer = null;
+        var selectedStatusFile = null;
+        var storyTimer = null;
 
         // WebRTC
-        let peerConnection = null;
-        let localStream = null;
-        let screenStream = null;
-        let incomingOffer = null;
-        const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+        var peerConnection = null;
+        var localStream = null;
+        var screenStream = null;
+        var incomingOffer = null;
+        var rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-        const emojis = ["😀","😂","😍","🥰","😎","🔥","👍","❤️","🎉","🙏","🚀","💯","😭","😡","🤔","👏","🥳","✨","💀","👀","🙌","✌️","⚡","🍕","☕","💡"];
+        var emojis = ["😀","😂","😍","🥰","😎","🔥","👍","❤️","🎉","🙏","🚀","💯","😭","😡","🤔","👏","🥳","✨","💀","👀","🙌","✌️","⚡","🍕","☕","💡"];
         initEmojiPicker();
 
-        if (token) showApp();
+        if (token) {
+            showApp();
+        }
 
         function toggleAuthMode() {
             isRegisterMode = !isRegisterMode;
@@ -767,15 +825,22 @@
         }
 
         async function handleGoogleCredentialResponse(response) {
-            const res = await fetch("/api/auth/google", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id_token: response.credential })
-            });
-            if (res.ok) {
-                saveAuth(await res.json());
-            } else {
-                document.getElementById("authError").textContent = "Google ile giriş başarısız.";
+            try {
+                const res = await fetch("/api/auth/google", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id_token: response.credential })
+                });
+                if (res.ok) {
+                    saveAuth(await res.json());
+                } else {
+                    const errTxt = await res.text();
+                    document.getElementById("authError").textContent = "Google ile giriş hatası: " + errTxt;
+                    console.error("Google Auth Error:", errTxt);
+                }
+            } catch(err) {
+                document.getElementById("authError").textContent = "Sunucu bağlantı hatası: " + err.message;
+                console.error("Google Auth Fetch Error:", err);
             }
         }
 
@@ -860,7 +925,9 @@
             document.getElementById("appContainer").style.display = "block";
             
             const res = await fetch("/api/me", { headers: { "Authorization": "Bearer " + token } });
-            if (res.ok) currentUser = await res.json();
+            if (res.ok) {
+                currentUser = await res.json();
+            }
 
             connectWebSocket();
             loadSidebar();
@@ -880,7 +947,7 @@
 
         function connectWebSocket() {
             const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-            ws = new WebSocket(`${protocol}//${window.location.host}/ws?token=${token}`);
+            ws = new WebSocket(protocol + "//" + window.location.host + "/ws?token=" + token);
 
             ws.onmessage = async function(event) {
                 const msg = JSON.parse(event.data);
@@ -927,7 +994,7 @@
                             if (textSpan) textSpan.textContent = msg.content;
                             const timeSpan = el.querySelector(".message-time");
                             if (timeSpan && !timeSpan.querySelector(".edited-tag")) {
-                                timeSpan.insertAdjacentHTML("afterbegin", `<span class="edited-tag">(düzenlendi)</span>`);
+                                timeSpan.insertAdjacentHTML("afterbegin", '<span class="edited-tag">(düzenlendi)</span>');
                             }
                         }
                     } else if (msg.type === "reaction") {
@@ -966,12 +1033,8 @@
                 list.forEach(s => {
                     const div = document.createElement("div");
                     div.className = "story-circle-wrap";
-                    div.innerHTML = `
-                        <div class="story-circle">
-                            <div class="story-avatar">${s.avatar_url ? `<img src="${s.avatar_url}">` : s.username.charAt(0).toUpperCase()}</div>
-                        </div>
-                        <div class="story-username">${escapeHtml(s.username)}</div>
-                    `;
+                    const avatarContent = s.avatar_url ? '<img src="' + s.avatar_url + '">' : s.username.charAt(0).toUpperCase();
+                    div.innerHTML = '<div class="story-circle"><div class="story-avatar">' + avatarContent + '</div></div><div class="story-username">' + escapeHtml(s.username) + '</div>';
                     div.onclick = () => openStoryViewer(s);
                     feed.appendChild(div);
                 });
@@ -982,7 +1045,7 @@
             const overlay = document.getElementById("storyViewerOverlay");
             overlay.style.display = "flex";
 
-            document.getElementById("storyViewAvatar").innerHTML = story.avatar_url ? `<img src="${story.avatar_url}" style="width:100%; height:100%; border-radius:50%;">` : story.username.charAt(0).toUpperCase();
+            document.getElementById("storyViewAvatar").innerHTML = story.avatar_url ? '<img src="' + story.avatar_url + '" style="width:100%; height:100%; border-radius:50%;">' : story.username.charAt(0).toUpperCase();
             document.getElementById("storyViewUsername").textContent = story.username;
             document.getElementById("storyViewTime").textContent = new Date(story.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 
@@ -998,12 +1061,11 @@
 
             const footer = document.getElementById("storyViewersFooter");
             if (story.user_id === currentUserID && story.views && story.views.length > 0) {
-                footer.textContent = `👀 Görenler (${story.views.length}): ${story.views.join(', ')}`;
+                footer.textContent = "👀 Görenler (" + story.views.length + "): " + story.views.join(', ');
             } else {
                 footer.textContent = "";
             }
 
-            // Progress bar animation
             const progress = document.getElementById("storyProgressFill");
             progress.style.width = "0%";
             let start = Date.now();
@@ -1106,7 +1168,7 @@
             const container = document.getElementById("sidebarList");
             container.innerHTML = "";
             if (list.length === 0) {
-                container.innerHTML = `<div style="padding:24px; text-align:center; color:var(--text-secondary); font-size:13px;">Sohbet bulunmuyor.</div>`;
+                container.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-secondary); font-size:13px;">Sohbet bulunmuyor.</div>';
                 return;
             }
             list.forEach(c => {
@@ -1114,26 +1176,24 @@
                 const isOnline = !isGroup && c.target_user && c.target_user.is_online;
                 const div = document.createElement("div");
                 div.className = "user-item " + (activeConvID === c.id ? "active" : "");
-                div.innerHTML = `
-                    <div class="avatar-wrap">
-                        <div class="avatar ${isGroup ? 'group' : ''}">${c.avatar_url ? `<img src="${c.avatar_url}">` : (c.name || '?').charAt(0).toUpperCase()}</div>
-                        <div class="online-dot ${isOnline ? 'active' : ''}"></div>
-                    </div>
-                    <div class="item-info">
-                        <div class="item-top">
-                            <div class="item-name">
-                                ${escapeHtml(c.name)}
-                                ${c.is_pinned ? '📌' : ''}
-                                ${c.is_muted ? '🔕' : ''}
-                            </div>
-                            <div class="item-time">${c.last_time ? new Date(c.last_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</div>
-                        </div>
-                        <div class="item-sub">
-                            <span>${escapeHtml(c.last_message || 'Henüz mesaj yok')}</span>
-                            ${c.unread_count > 0 ? `<span class="unread-badge">${c.unread_count}</span>` : ''}
-                        </div>
-                    </div>
-                `;
+                const avatarContent = c.avatar_url ? '<img src="' + c.avatar_url + '">' : (c.name || '?').charAt(0).toUpperCase();
+                const unreadBadge = c.unread_count > 0 ? '<span class="unread-badge">' + c.unread_count + '</span>' : '';
+                const timeText = c.last_time ? new Date(c.last_time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+
+                div.innerHTML = '<div class="avatar-wrap">' +
+                    '<div class="avatar ' + (isGroup ? 'group' : '') + '">' + avatarContent + '</div>' +
+                    '<div class="online-dot ' + (isOnline ? 'active' : '') + '"></div>' +
+                '</div>' +
+                '<div class="item-info">' +
+                    '<div class="item-top">' +
+                        '<div class="item-name">' + escapeHtml(c.name) + (c.is_pinned ? ' 📌' : '') + (c.is_muted ? ' 🔕' : '') + '</div>' +
+                        '<div class="item-time">' + timeText + '</div>' +
+                    '</div>' +
+                    '<div class="item-sub">' +
+                        '<span>' + escapeHtml(c.last_message || 'Henüz mesaj yok') + '</span>' +
+                        unreadBadge +
+                    '</div>' +
+                '</div>';
                 div.onclick = () => openConversation(c, div);
                 container.appendChild(div);
             });
@@ -1148,16 +1208,15 @@
                 users.forEach(u => {
                     const div = document.createElement("div");
                     div.className = "user-item";
-                    div.innerHTML = `
-                        <div class="avatar-wrap">
-                            <div class="avatar">${u.avatar_url ? `<img src="${u.avatar_url}">` : u.username.charAt(0).toUpperCase()}</div>
-                            <div class="online-dot ${u.is_online ? 'active' : ''}"></div>
-                        </div>
-                        <div class="item-info">
-                            <div class="item-name">${escapeHtml(u.username)}</div>
-                            <div class="item-sub">${u.is_online ? 'çevrimiçi' : formatLastSeen(u.last_seen_at)} • <i>${escapeHtml(u.about || '')}</i></div>
-                        </div>
-                    `;
+                    const avatarContent = u.avatar_url ? '<img src="' + u.avatar_url + '">' : u.username.charAt(0).toUpperCase();
+                    div.innerHTML = '<div class="avatar-wrap">' +
+                        '<div class="avatar">' + avatarContent + '</div>' +
+                        '<div class="online-dot ' + (u.is_online ? 'active' : '') + '"></div>' +
+                    '</div>' +
+                    '<div class="item-info">' +
+                        '<div class="item-name">' + escapeHtml(u.username) + '</div>' +
+                        '<div class="item-sub">' + (u.is_online ? 'çevrimiçi' : formatLastSeen(u.last_seen_at)) + ' • <i>' + escapeHtml(u.about || '') + '</i></div>' +
+                    '</div>';
                     div.onclick = () => openDirectChatWithUser(u, div);
                     container.appendChild(div);
                 });
@@ -1171,22 +1230,20 @@
             if (res.ok) {
                 const messages = await res.json() || [];
                 if (messages.length === 0) {
-                    container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-secondary); font-size:13px;">Yıldızlı mesaj bulunmuyor.</div>`;
+                    container.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-secondary); font-size:13px;">Yıldızlı mesaj bulunmuyor.</div>';
                     return;
                 }
                 messages.forEach(m => {
                     const div = document.createElement("div");
                     div.className = "user-item";
-                    div.innerHTML = `
-                        <div class="avatar-wrap"><div class="avatar">⭐</div></div>
-                        <div class="item-info">
-                            <div class="item-top">
-                                <div class="item-name">${escapeHtml(m.sender_username)}</div>
-                                <div class="item-time">${new Date(m.created_at).toLocaleDateString()}</div>
-                            </div>
-                            <div class="item-sub">${escapeHtml(m.content)}</div>
-                        </div>
-                    `;
+                    div.innerHTML = '<div class="avatar-wrap"><div class="avatar">⭐</div></div>' +
+                        '<div class="item-info">' +
+                            '<div class="item-top">' +
+                                '<div class="item-name">' + escapeHtml(m.sender_username) + '</div>' +
+                                '<div class="item-time">' + new Date(m.created_at).toLocaleDateString() + '</div>' +
+                            '</div>' +
+                            '<div class="item-sub">' + escapeHtml(m.content) + '</div>' +
+                        '</div>';
                     container.appendChild(div);
                 });
             }
@@ -1199,7 +1256,7 @@
             if (res.ok) {
                 const logs = await res.json() || [];
                 if (logs.length === 0) {
-                    container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-secondary); font-size:13px;">Arama kaydı bulunmuyor.</div>`;
+                    container.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-secondary); font-size:13px;">Arama kaydı bulunmuyor.</div>';
                     return;
                 }
                 logs.forEach(l => {
@@ -1207,16 +1264,14 @@
                     const peerName = isCaller ? l.receiver_name : l.caller_name;
                     const div = document.createElement("div");
                     div.className = "user-item";
-                    div.innerHTML = `
-                        <div class="avatar-wrap"><div class="avatar">${l.type === 'video' ? '📹' : '📞'}</div></div>
-                        <div class="item-info">
-                            <div class="item-top">
-                                <div class="item-name">${escapeHtml(peerName)}</div>
-                                <div class="item-time">${new Date(l.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
-                            </div>
-                            <div class="item-sub">${isCaller ? '↗ Giden' : '↙ Gelen'} (${l.status}) • ${l.duration_seconds}s</div>
-                        </div>
-                    `;
+                    div.innerHTML = '<div class="avatar-wrap"><div class="avatar">' + (l.type === 'video' ? '📹' : '📞') + '</div></div>' +
+                        '<div class="item-info">' +
+                            '<div class="item-top">' +
+                                '<div class="item-name">' + escapeHtml(peerName) + '</div>' +
+                                '<div class="item-time">' + new Date(l.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) + '</div>' +
+                            '</div>' +
+                            '<div class="item-sub">' + (isCaller ? '↗ Giden' : '↙ Gelen') + ' (' + l.status + ') • ' + l.duration_seconds + 's</div>' +
+                        '</div>';
                     container.appendChild(div);
                 });
             }
@@ -1255,8 +1310,11 @@
             document.getElementById("activeContactName").textContent = c.name;
             
             const avatarEl = document.getElementById("activeAvatar");
-            if (c.avatar_url) avatarEl.innerHTML = `<img src="${c.avatar_url}">`;
-            else avatarEl.textContent = (c.name || '?').charAt(0).toUpperCase();
+            if (c.avatar_url) {
+                avatarEl.innerHTML = '<img src="' + c.avatar_url + '">';
+            } else {
+                avatarEl.textContent = (c.name || '?').charAt(0).toUpperCase();
+            }
 
             document.getElementById("voiceCallBtn").style.display = (c.type === "direct") ? "block" : "none";
             document.getElementById("videoCallBtn").style.display = (c.type === "direct") ? "block" : "none";
@@ -1334,8 +1392,9 @@
             return "son görülme " + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        async function loadMessages(convID, beforeID = 0) {
-            const url = beforeID > 0 ? `/api/conversations/messages?conv_id=${convID}&before_id=${beforeID}` : `/api/conversations/messages?conv_id=${convID}`;
+        async function loadMessages(convID, beforeID) {
+            beforeID = beforeID || 0;
+            const url = beforeID > 0 ? "/api/conversations/messages?conv_id=" + convID + "&before_id=" + beforeID : "/api/conversations/messages?conv_id=" + convID;
             const res = await fetch(url, { headers: { "Authorization": "Bearer " + token } });
             const feed = document.getElementById("messagesFeed");
             if (beforeID === 0) feed.innerHTML = "";
@@ -1355,121 +1414,121 @@
             }
         }
 
-        function appendMessageBubble(msg, prepend = false) {
+        function appendMessageBubble(msg, prepend) {
+            prepend = prepend || false;
             const feed = document.getElementById("messagesFeed");
             const isMe = msg.sender_id === currentUserID;
             const bubble = document.createElement("div");
             bubble.id = "msg_" + msg.id;
-            bubble.className = "message-bubble " + (isMe ? "outgoing" : "incoming") + (msg.is_deleted ? " deleted" : "");
+            const hasReactions = msg.reactions && msg.reactions.length > 0;
+            bubble.className = "message-bubble " + (isMe ? "outgoing" : "incoming") + (msg.is_deleted ? " deleted" : "") + (hasReactions ? " has-reactions" : "");
 
             const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const isRead = msg.status === "read";
 
             let quoteHtml = "";
             if (msg.reply_to_id && msg.reply_to_content) {
-                quoteHtml = `
-                    <div class="message-quote">
-                        <strong>${escapeHtml(msg.reply_to_sender)}:</strong> ${escapeHtml(msg.reply_to_content)}
-                    </div>
-                `;
+                quoteHtml = '<div class="message-quote"><strong>' + escapeHtml(msg.reply_to_sender) + ':</strong> ' + escapeHtml(msg.reply_to_content) + '</div>';
             }
 
-            let authorHtml = (!isMe && activeConvType === "group") ? `<div class="message-author">${escapeHtml(msg.sender_username)}</div>` : "";
+            let authorHtml = (!isMe && activeConvType === "group") ? '<div class="message-author">' + escapeHtml(msg.sender_username) + '</div>' : "";
             
             let mediaHtml = "";
             if (!msg.is_deleted) {
                 if (msg.type === "image" && msg.media_url) {
-                    mediaHtml = `<img src="${msg.media_url}" class="message-media-img" onclick="window.open('${msg.media_url}')">`;
+                    mediaHtml = '<img src="' + msg.media_url + '" class="message-media-img" onclick="window.open(\'' + msg.media_url + '\')">';
                 } else if (msg.type === "video" && msg.media_url) {
-                    mediaHtml = `<video src="${msg.media_url}" controls class="message-video"></video>`;
+                    mediaHtml = '<video src="' + msg.media_url + '" controls class="message-video"></video>';
                 } else if (msg.type === "audio" && msg.media_url) {
-                    mediaHtml = `<audio src="${msg.media_url}" controls class="message-audio"></audio>`;
+                    mediaHtml = '<audio src="' + msg.media_url + '" controls class="message-audio"></audio>';
                 } else if (msg.type === "file" && msg.media_url) {
-                    mediaHtml = `<div><a href="${msg.media_url}" target="_blank" style="color:var(--accent); text-decoration:none;">📄 ${escapeHtml(msg.file_name || 'Dosyayı İndir')}</a></div>`;
+                    mediaHtml = '<div><a href="' + msg.media_url + '" target="_blank" style="color:var(--accent); text-decoration:none;">📄 ' + escapeHtml(msg.file_name || 'Dosyayı İndir') + '</a></div>';
                 } else if (msg.type === "location") {
-                    mediaHtml = `<div><a href="https://maps.google.com/?q=${msg.location_lat},${msg.location_lng}" target="_blank" style="color:var(--accent); text-decoration:none;">📍 Konum Görüntüle (${msg.location_lat.toFixed(4)}, ${msg.location_lng.toFixed(4)})</a></div>`;
+                    mediaHtml = '<div><a href="https://maps.google.com/?q=' + msg.location_lat + ',' + msg.location_lng + '" target="_blank" style="color:var(--accent); text-decoration:none;">📍 Konum Görüntüle (' + msg.location_lat.toFixed(4) + ', ' + msg.location_lng.toFixed(4) + ')</a></div>';
                 } else if (msg.type === "poll" && msg.poll) {
                     mediaHtml = renderPollHTML(msg.poll);
                 }
 
                 if (msg.link_preview && msg.link_preview.title) {
-                    mediaHtml += `
-                        <a href="${msg.link_preview.url}" target="_blank" class="link-preview-card">
-                            ${msg.link_preview.image ? `<img src="${msg.link_preview.image}" class="link-preview-img">` : ''}
-                            <div class="link-preview-info">
-                                <div class="link-preview-title">${escapeHtml(msg.link_preview.title)}</div>
-                                <div class="link-preview-desc">${escapeHtml(msg.link_preview.description || '')}</div>
-                            </div>
-                        </a>
-                    `;
+                    const prevImg = msg.link_preview.image ? '<img src="' + msg.link_preview.image + '" class="link-preview-img">' : '';
+                    mediaHtml += '<a href="' + msg.link_preview.url + '" target="_blank" class="link-preview-card">' +
+                        prevImg +
+                        '<div class="link-preview-info">' +
+                            '<div class="link-preview-title">' + escapeHtml(msg.link_preview.title) + '</div>' +
+                            '<div class="link-preview-desc">' + escapeHtml(msg.link_preview.description || '') + '</div>' +
+                        '</div>' +
+                    '</a>';
                 }
             }
 
             let actionHtml = "";
             if (!msg.is_deleted) {
-                actionHtml = `
-                    <div class="bubble-actions">
-                        <button class="act-btn" onclick="sendReaction(${msg.id}, '👍')">👍</button>
-                        <button class="act-btn" onclick="sendReaction(${msg.id}, '❤️')">❤️</button>
-                        <button class="act-btn" onclick="sendReaction(${msg.id}, '😂')">😂</button>
-                        <button class="act-btn" onclick="sendReaction(${msg.id}, '🔥')">🔥</button>
-                        <button class="act-btn" onclick="toggleStar(${msg.id})">⭐</button>
-                        <button class="act-btn" onclick="setReply(${msg.id}, '${escapeHtml(msg.content)}', '${escapeHtml(msg.sender_username)}')">↩️</button>
-                        <button class="act-btn" onclick="forwardMessagePrompt(${msg.id}, '${escapeHtml(msg.content)}')">↗️</button>
-                        ${isMe ? `
-                            <button class="act-btn" onclick="editMessagePrompt(${msg.id}, '${escapeHtml(msg.content)}')">✏️</button>
-                            <button class="act-btn" onclick="deleteMessage(${msg.id}, true)">🗑️ Herkesten</button>
-                        ` : ''}
-                        <button class="act-btn" onclick="deleteMessage(${msg.id}, false)">🗑️ Benden</button>
-                    </div>
-                `;
+                let editDeleteBtns = "";
+                if (isMe) {
+                    editDeleteBtns = '<button class="act-btn" onclick="editMessagePrompt(' + msg.id + ', \'' + escapeHtml(msg.content) + '\')">✏️</button>' +
+                                     '<button class="act-btn" onclick="deleteMessage(' + msg.id + ', true)">🗑️</button>';
+                }
+                actionHtml = '<div class="bubble-actions">' +
+                    '<button class="act-btn" onclick="sendReaction(' + msg.id + ', \'👍\')">👍</button>' +
+                    '<button class="act-btn" onclick="sendReaction(' + msg.id + ', \'❤️\')">❤️</button>' +
+                    '<button class="act-btn" onclick="sendReaction(' + msg.id + ', \'😂\')">😂</button>' +
+                    '<button class="act-btn" onclick="sendReaction(' + msg.id + ', \'🔥\')">🔥</button>' +
+                    '<button class="act-btn" onclick="toggleStar(' + msg.id + ')">⭐</button>' +
+                    '<button class="act-btn" onclick="setReply(' + msg.id + ', \'' + escapeHtml(msg.content) + '\', \'' + escapeHtml(msg.sender_username) + '\')">↩️</button>' +
+                    '<button class="act-btn" onclick="forwardMessagePrompt(' + msg.id + ', \'' + escapeHtml(msg.content) + '\')">↗️</button>' +
+                    editDeleteBtns +
+                    '<button class="act-btn" onclick="deleteMessage(' + msg.id + ', false)">❌</button>' +
+                '</div>';
             }
 
-            let reactionsHtml = `<div class="reactions-bar" id="react_${msg.id}">`;
+            let reactionsHtml = '<div class="reactions-bar" id="react_' + msg.id + '">';
             if (msg.reactions && msg.reactions.length > 0) {
                 msg.reactions.forEach(r => {
-                    reactionsHtml += `<span class="reaction-badge" onclick="sendReaction(${msg.id}, '${r.emoji}')">${r.emoji} ${r.count}</span>`;
+                    reactionsHtml += '<span class="reaction-badge" onclick="sendReaction(' + msg.id + ', \'' + r.emoji + '\')">' + r.emoji + ' ' + r.count + '</span>';
                 });
             }
-            reactionsHtml += `</div>`;
+            reactionsHtml += '</div>';
 
-            bubble.innerHTML = `
-                ${actionHtml}
-                ${quoteHtml}
-                ${authorHtml}
-                ${mediaHtml}
-                ${(msg.type !== 'image' && msg.type !== 'video' && msg.type !== 'audio' && msg.type !== 'poll') || msg.is_deleted ? `<span class="msg-text">${escapeHtml(msg.content)}</span>` : ''}
-                <span class="message-time">
-                    ${msg.is_starred ? '<span class="star-icon">⭐</span>' : ''}
-                    ${msg.is_edited ? '<span class="edited-tag">(düzenlendi)</span>' : ''}
-                    ${time}
-                    ${isMe && !msg.is_deleted ? `<span class="ticks ${isRead ? 'read' : ''}">✓✓</span>` : ''}
-                </span>
-                ${reactionsHtml}
-            `;
+            const msgText = ((msg.type !== 'image' && msg.type !== 'video' && msg.type !== 'audio' && msg.type !== 'poll') || msg.is_deleted) ? '<span class="msg-text">' + escapeHtml(msg.content) + '</span>' : '';
+            const starTag = msg.is_starred ? '<span class="star-icon">⭐</span>' : '';
+            const editTag = msg.is_edited ? '<span class="edited-tag">(düzenlendi)</span>' : '';
+            const readTicks = (isMe && !msg.is_deleted) ? '<span class="ticks ' + (isRead ? 'read' : '') + '">✓✓</span>' : '';
 
-            if (prepend) feed.prepend(bubble);
-            else {
+            bubble.innerHTML = actionHtml +
+                quoteHtml +
+                authorHtml +
+                mediaHtml +
+                msgText +
+                '<span class="message-time">' +
+                    starTag +
+                    editTag +
+                    time +
+                    readTicks +
+                '</span>' +
+                reactionsHtml;
+
+            if (prepend) {
+                feed.prepend(bubble);
+            } else {
                 feed.appendChild(bubble);
                 feed.scrollTop = feed.scrollHeight;
             }
         }
 
         function renderPollHTML(poll) {
-            let html = `<div class="poll-card" id="poll_${poll.id}"><div class="poll-question">📊 ${escapeHtml(poll.question)}</div>`;
+            let html = '<div class="poll-card" id="poll_' + poll.id + '"><div class="poll-question">📊 ' + escapeHtml(poll.question) + '</div>';
             poll.options.forEach(opt => {
                 const percent = poll.total_votes > 0 ? Math.round((opt.vote_count / poll.total_votes) * 100) : 0;
-                html += `
-                    <div class="poll-opt ${opt.has_voted ? 'voted' : ''}" onclick="votePoll(${poll.id}, ${opt.id})">
-                        <div class="poll-bar" style="width: ${percent}%;"></div>
-                        <div class="poll-opt-content">
-                            <span>${opt.has_voted ? '✓ ' : ''}${escapeHtml(opt.text)}</span>
-                            <span>${opt.vote_count} (${percent}%)</span>
-                        </div>
-                    </div>
-                `;
+                const checkMark = opt.has_voted ? '✓ ' : '';
+                html += '<div class="poll-opt ' + (opt.has_voted ? 'voted' : '') + '" onclick="votePoll(' + poll.id + ', ' + opt.id + ')">' +
+                    '<div class="poll-bar" style="width: ' + percent + '%;"></div>' +
+                    '<div class="poll-opt-content">' +
+                        '<span>' + checkMark + escapeHtml(opt.text) + '</span>' +
+                        '<span style="font-weight:bold;">' + opt.vote_count + ' (' + percent + '%)</span>' +
+                    '</div>' +
+                '</div>';
             });
-            html += `<div style="font-size:11px; color:var(--text-secondary); text-align:right;">Toplam ${poll.total_votes} oy</div></div>`;
+            html += '<div style="font-size:11px; color:var(--text-secondary); text-align:right; margin-top:4px;">Toplam ' + poll.total_votes + ' oy</div></div>';
             return html;
         }
 
@@ -1479,14 +1538,15 @@
                     type: "poll_vote",
                     conversation_id: activeConvID,
                     poll_id: pollID,
+                    poll_option_id: optionID,
                     option_id: optionID
                 }));
             }
         }
 
         function setReply(id, content, sender) {
-            replyingTo = { id, content, sender };
-            document.getElementById("replyPreviewText").innerHTML = `<strong>${escapeHtml(sender)}:</strong> ${escapeHtml(content)}`;
+            replyingTo = { id: id, content: content, sender: sender };
+            document.getElementById("replyPreviewText").innerHTML = '<strong>' + escapeHtml(sender) + ':</strong> ' + escapeHtml(content);
             document.getElementById("replyPreviewBar").style.display = "flex";
             document.getElementById("msgInput").focus();
         }
@@ -1513,16 +1573,20 @@
 
         function updateMessageReactions(msgID, reactions) {
             const rContainer = document.getElementById("react_" + msgID);
+            const bubble = document.getElementById("msg_" + msgID);
             if (rContainer) {
                 rContainer.innerHTML = "";
-                if (reactions) {
+                if (reactions && reactions.length > 0) {
+                    if (bubble) bubble.classList.add("has-reactions");
                     reactions.forEach(r => {
                         const badge = document.createElement("span");
                         badge.className = "reaction-badge";
-                        badge.innerHTML = `${r.emoji} ${r.count}`;
+                        badge.innerHTML = r.emoji + ' ' + r.count;
                         badge.onclick = () => sendReaction(msgID, r.emoji);
                         rContainer.appendChild(badge);
                     });
+                } else {
+                    if (bubble) bubble.classList.remove("has-reactions");
                 }
             }
         }
@@ -1539,7 +1603,7 @@
                 const urlMatch = text.match(/(https?:\/\/[^\s]+)/g);
                 if (urlMatch && urlMatch.length > 0) {
                     try {
-                        const pRes = await fetch(`/api/preview-link?url=${encodeURIComponent(urlMatch[0])}`, { headers: { "Authorization": "Bearer " + token } });
+                        const pRes = await fetch('/api/preview-link?url=' + encodeURIComponent(urlMatch[0]), { headers: { "Authorization": "Bearer " + token } });
                         if (pRes.ok) linkPreview = await pRes.json();
                     } catch(e) {}
                 }
@@ -1659,7 +1723,6 @@
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
 
-                    // Web Audio Analyser for live waveform
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     analyser = audioCtx.createAnalyser();
                     analyser.fftSize = 64;
@@ -1695,7 +1758,6 @@
                     mediaRecorder.start();
                     isRecording = true;
 
-                    // UI Switch to Recording Bar
                     document.getElementById("standardInputGroup").style.display = "none";
                     document.getElementById("recordingBar").style.display = "flex";
                     document.getElementById("micBtn").style.display = "none";
@@ -1708,7 +1770,7 @@
                         recordSeconds++;
                         const m = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
                         const s = String(recordSeconds % 60).padStart(2, '0');
-                        document.getElementById("recTimerDisplay").textContent = `${m}:${s}`;
+                        document.getElementById("recTimerDisplay").textContent = m + ":" + s;
                     }, 1000);
 
                     startWaveformAnimation();
@@ -1813,21 +1875,21 @@
         }
 
         async function openGalleryModal() {
-            const res = await fetch(`/api/conversations/gallery?conv_id=${activeConvID}`, { headers: { "Authorization": "Bearer " + token } });
+            const res = await fetch("/api/conversations/gallery?conv_id=" + activeConvID, { headers: { "Authorization": "Bearer " + token } });
             if (res.ok) {
                 const list = await res.json() || [];
                 const feed = document.getElementById("galleryFeed");
                 feed.innerHTML = "";
                 if (list.length === 0) {
-                    feed.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-secondary);">Medya bulunamadı.</div>`;
+                    feed.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-secondary);">Medya bulunamadı.</div>';
                 }
                 list.forEach(m => {
                     if (m.type === 'image') {
-                        feed.innerHTML += `<img src="${m.media_url}" style="width:100%; height:110px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="window.open('${m.media_url}')">`;
+                        feed.innerHTML += '<img src="' + m.media_url + '" style="width:100%; height:110px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="window.open(\'' + m.media_url + '\')">';
                     } else if (m.type === 'video') {
-                        feed.innerHTML += `<video src="${m.media_url}" style="width:100%; height:110px; object-fit:cover; border-radius:6px;" controls></video>`;
+                        feed.innerHTML += '<video src="' + m.media_url + '" style="width:100%; height:110px; object-fit:cover; border-radius:6px;" controls></video>';
                     } else {
-                        feed.innerHTML += `<div style="background:var(--bg-header); padding:10px; border-radius:6px; font-size:11px; overflow:hidden;"><a href="${m.media_url}" target="_blank" style="color:var(--accent);">📄 ${escapeHtml(m.file_name || 'Dosya')}</a></div>`;
+                        feed.innerHTML += '<div style="background:var(--bg-header); padding:10px; border-radius:6px; font-size:11px; overflow:hidden;"><a href="' + m.media_url + '" target="_blank" style="color:var(--accent);">📄 ' + escapeHtml(m.file_name || 'Dosya') + '</a></div>';
                     }
                 });
                 document.getElementById("galleryModal").style.display = "flex";
@@ -1836,14 +1898,14 @@
 
         function openChatInfoModal() {
             if (activeConvType === 'group') {
-                fetch(`/api/conversations/members?conv_id=${activeConvID}`, { headers: { "Authorization": "Bearer " + token } })
+                fetch("/api/conversations/members?conv_id=" + activeConvID, { headers: { "Authorization": "Bearer " + token } })
                     .then(r => r.json())
                     .then(members => {
-                        const mNames = members.map(m => `• ${m.username}`).join('\n');
-                        alert(`👥 Grup: ${document.getElementById("activeContactName").textContent}\n\nÜyeler:\n${mNames}`);
+                        const mNames = members.map(m => "• " + m.username).join('\n');
+                        alert("👥 Grup: " + document.getElementById("activeContactName").textContent + "\n\nÜyeler:\n" + mNames);
                     });
             } else if (activeTargetUser) {
-                alert(`👤 Kullanıcı: ${activeTargetUser.username}\nAbout: ${activeTargetUser.about || '-'}\nDurum: ${activeTargetUser.is_online ? 'Çevrimiçi' : formatLastSeen(activeTargetUser.last_seen_at)}`);
+                alert("👤 Kullanıcı: " + activeTargetUser.username + "\nAbout: " + (activeTargetUser.about || '-') + "\nDurum: " + (activeTargetUser.is_online ? 'Çevrimiçi' : formatLastSeen(activeTargetUser.last_seen_at)));
             }
         }
 
@@ -1889,7 +1951,7 @@
         async function searchMessages() {
             const q = document.getElementById("searchInput").value.trim();
             if (!q) { loadMessages(activeConvID); return; }
-            const res = await fetch(`/api/conversations/search?conv_id=${activeConvID}&q=${encodeURIComponent(q)}`, {
+            const res = await fetch("/api/conversations/search?conv_id=" + activeConvID + "&q=" + encodeURIComponent(q), {
                 headers: { "Authorization": "Bearer " + token }
             });
             if (res.ok) {
@@ -2004,8 +2066,11 @@
             const camBtn = document.getElementById("camToggleBtn");
             const localCamOff = document.getElementById("localCamOff");
 
-            if (isAudioMuted) micBtn.className = "call-btn toggle muted";
-            else micBtn.className = "call-btn toggle";
+            if (isAudioMuted) {
+                micBtn.className = "call-btn toggle muted";
+            } else {
+                micBtn.className = "call-btn toggle";
+            }
 
             if (isVideoMuted) {
                 camBtn.className = "call-btn toggle disabled";
@@ -2117,10 +2182,8 @@
                 users.forEach(u => {
                     const div = document.createElement("div");
                     div.className = "member-checkbox-item";
-                    div.innerHTML = `
-                        <input type="checkbox" id="user_chk_${u.id}" value="${u.id}">
-                        <label for="user_chk_${u.id}" style="font-size:14px; cursor:pointer;">${escapeHtml(u.username)}</label>
-                    `;
+                    div.innerHTML = '<input type="checkbox" id="user_chk_' + u.id + '" value="' + u.id + '">' +
+                        '<label for="user_chk_' + u.id + '" style="font-size:14px; cursor:pointer;">' + escapeHtml(u.username) + '</label>';
                     list.appendChild(div);
                 });
                 document.getElementById("groupModal").style.display = "flex";
